@@ -1,0 +1,12 @@
+// app.component.ts import { Component } from '@angular/core'; import { DynamicFormField } from './dynamic-form-field.model'; import { DynamicFormButton } from './dynamic-form-button.model';
+
+@Component({ selector: 'app-root', template: <app-dynamic-form [fields]="fields" [buttons]="buttons"></app-dynamic-form> }) export class AppComponent { fields: DynamicFormField[] = [ { type: 'text', label: 'Name', name: 'name', validators: [], cssClass: 'form-field', style: { marginBottom: '16px' } }, { type: 'checkbox', label: 'Accept Terms', name: 'terms', value: false }, { type: 'radio', label: 'Gender', name: 'gender', options: [ { label: 'Male', value: 'male' }, { label: 'Female', value: 'female' } ] }, { type: 'multiselect', label: 'Skills', name: 'skills', options: [ { label: 'Angular', value: 'angular' }, { label: 'React', value: 'react' }, { label: 'Vue', value: 'vue' } ] }, { type: 'calendar', label: 'Date of Birth', name: 'dob' } ];
+
+buttons: DynamicFormButton[] = [ { label: 'Submit', type: 'submit', cssClass: 'submit-btn', callback: () => { console.log('Submit clicked'); } }, { label: 'Cancel', type: 'button', cssClass: 'cancel-btn', style: { marginLeft: '12px' }, callback: () => { console.log('Cancel clicked'); } } ]; }
+
+// styles.css .form-field { width: 100%; }
+
+.submit-btn { background-color: #3f51b5; color: white; padding: 8px 16px; }
+
+.cancel-btn { background-color: #e0e0e0; color: black; padding: 8px 16px; }
+
