@@ -1,0 +1,122 @@
+To build a dynamic Angular Material UI form with the described features, follow these steps:
+
+
+---
+
+1. Define Dynamic Field Interface
+
+export interface DynamicFormField {
+  type: 'text' | 'checkbox' | 'radio' | 'multiselect' | 'dropdown' | 'calendar';
+  label: string;
+  name: string;
+  value?: any;
+  options?: { label: string; value: any }[];
+  validators?: any[];
+  cssClass?: string;
+  style?: { [key: string]: any };
+}
+
+
+---
+
+2. Define Dynamic Button Interface
+
+export interface DynamicFormButton {
+  label: string;
+  type: 'submit' | 'reset' | 'button';
+  cssClass?: string;
+  style?: { [key: string]: any };
+  callback: () => void;
+}
+
+
+---
+
+3. Create a Factory Service
+
+@Injectable({ providedIn: 'root' })
+export class DynamicFieldFactoryService {
+  createControl(field: DynamicFormField): FormControl {
+    return new FormControl(field.value || '', field.validators || []);
+  }
+}
+
+
+---
+
+4. Dynamic Form Builder Component
+
+HTML:
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <ng-container *ngFor="let field of fields">
+    <div [ngClass]="field.cssClass" [ngStyle]="field.style">
+      <mat-form-field *ngIf="field.type === 'text'">
+        <mat-label>{{ field.label }}</mat-label>
+        <input matInput [formControlName]="field.name" />
+      </mat-form-field>
+
+      <mat-checkbox *ngIf="field.type === 'checkbox'" [formControlName]="field.name">
+        {{ field.label }}
+      </mat-checkbox>
+
+      <mat-radio-group *ngIf="field.type === 'radio'" [formControlName]="field.name">
+        <mat-label>{{ field.label }}</mat-label>
+        <mat-radio-button *ngFor="let opt of field.options" [value]="opt.value">
+          {{ opt.label }}
+        </mat-radio-button>
+      </mat-radio-group>
+
+      <mat-select *ngIf="field.type === 'dropdown' || field.type === 'multiselect'"
+                  [formControlName]="field.name"
+                  [multiple]="field.type === 'multiselect'">
+        <mat-option *ngFor="let opt of field.options" [value]="opt.value">
+          {{ opt.label }}
+        </mat-option>
+      </mat-select>
+
+      <mat-form-field *ngIf="field.type === 'calendar'">
+        <mat-label>{{ field.label }}</mat-label>
+        <input matInput [matDatepicker]="picker" [formControlName]="field.name" />
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </ng-container>
+
+  <div *ngFor="let btn of buttons">
+    <button [type]="btn.type" [ngClass]="btn.cssClass" [ngStyle]="btn.style" (click)="btn.callback()">
+      {{ btn.label }}
+    </button>
+  </div>
+</form>
+
+TS:
+
+@Component({ ... })
+export class DynamicFormComponent implements OnInit {
+  @Input() fields: DynamicFormField[] = [];
+  @Input() buttons: DynamicFormButton[] = [];
+
+  form: FormGroup = this.fb.group({});
+
+  constructor(private fb: FormBuilder, private factory: DynamicFieldFactoryService) {}
+
+  ngOnInit() {
+    for (let field of this.fields) {
+      this.form.addControl(field.name, this.factory.createControl(field));
+    }
+  }
+
+  onSubmit() {
+    if (this.form.valid) {
+      console.log('Form Submitted', this.form.value);
+    }
+  }
+}
+
+
+---
+
+Would you like a working StackBlitz demo or should I help you generate a reusable module for this form builder?
+
